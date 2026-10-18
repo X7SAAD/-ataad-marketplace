@@ -6,9 +6,7 @@
 <meta name="theme-color" content="#0b0b10">
 <meta name="description" content="عَتاد - حراج القيمنق والـ Setup والبرمجيات في السعودية">
 <title>عَتاد | حراج القيمنق والـ Setup</title>
-<!-- Tailwind CSS for styling -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Firebase JS SDK v9 (Compat for quick embedded database) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -56,9 +54,9 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
           <option value="الرياض">الرياض</option>
           <option value="جدة">جدة</option>
           <option value="الشرقية">الشرقية / الخبر / الدمام</option>
+          <option value="الأحساء">الأحساء</option>
           <option value="مكة / المدينة">مكة / المدينة</option>
           <option value="القصيم">القصيم</option>
-          <option value="عسير / الجنوب">عسير / الجنوب</option>
           <option value="أخرى">مدينة أخرى</option>
         </select>
       </div>
@@ -94,7 +92,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
   <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-lg rounded-3xl p-6 relative my-8">
     <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
     <h3 class="text-xl font-bold text-white mb-1">إضافة إعلان جديد للحراج 🚀</h3>
-    <p class="text-xs text-gray-400 mb-4">سعر إعلانك يعبر عن قيمتك، ويظهر فوراً لجميع زوار المنصة.</p>
+    <p class="text-xs text-gray-400 mb-4">أنزل إعلانك وسيظهر فوراً لجميع زوار المنصة.</p>
     
     <form id="addForm" onsubmit="submitAd(event)" class="space-y-3">
       <div>
@@ -145,8 +143,8 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-gray-300 mb-1">صورة السلعة (رفع مباشر) 📸</label>
-        <input type="file" id="adImageFile" accept="image/*" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-2 text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:font-bold">
+        <label class="block text-xs font-semibold text-gray-300 mb-1">رابط صورة السلعة (اختياري - انسخ رابط صورة إن توفر)</label>
+        <input id="adImageUrl" type="url" placeholder="https://example.com/image.jpg" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
       </div>
 
       <div>
@@ -184,19 +182,13 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
       <div class="text-gray-300">اسم الحساب: <strong class="text-white">منصة عَتاد لوساطة القيمنق</strong></div>
       <div class="text-gray-300">الآيبان IBAN:</div>
       <div class="bg-[#1a1a28] p-2 rounded border border-purple-500/30 text-purple-300 font-mono text-center font-bold tracking-widest selection:bg-purple-600">
-        SA6180000308608010670122
+        SA0000000000000000000000
       </div>
-    </div>
-
-    <div class="text-xs text-gray-400 text-center">
-      بعد التحويل، يرجى إرسال إيصال التحويل مع اسم الإعلان لتأكيد توثيق حسابك وإبراز إعلاناتك كـ "موثوق".
     </div>
   </div>
 </div>
 
-<!-- JS Implementation with Firebase Integration -->
 <script>
-// Firebase Public Demo Instance Config
 const firebaseConfig = {
   databaseURL: "https://atad-gaming-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
@@ -205,7 +197,6 @@ const db = firebase.database();
 
 let allProducts = [];
 let activeCategory = "الكل";
-
 const categories = ["الكل", "🖥️ شاشات وستاندات", "🎮 أجهزة وكونسول / PC", "⌨️ كيبوردات وماوسات", "🎧 صوتيات ومايكات", "💡 طاولات وإضاءات", "📦 قطع وإكسسوارات"];
 
 function renderCategories() {
@@ -223,7 +214,6 @@ function setCategory(cat) {
   filterProducts();
 }
 
-// Realtime Firebase Listener
 db.ref('listings').on('value', (snapshot) => {
   const data = snapshot.val();
   allProducts = [];
@@ -251,7 +241,7 @@ function filterProducts() {
   const grid = document.getElementById("productsGrid");
 
   if (!filtered.length) {
-    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">لا توجد إعلانات مطابقة لجميع شروط البحث حالياً. كن أول من يضيف إعلاناً!</div>`;
+    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">لا توجد إعلانات مطابقة حالياً. كن أول من يضيف إعلاناً!</div>`;
     return;
   }
 
@@ -270,7 +260,7 @@ function filterProducts() {
       </div>
       <div class="p-4 pt-0">
         <div class="text-lg font-black text-purple-400 mb-3">${Number(p.price).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ر.س</span></div>
-        <a href="https://wa.me/966${p.phone.replace(/^0/,'')}?text=${encodeURIComponent('السلام عليكم، أنا متواصل معك بخصوص إعلانك في عَتاد: ' + p.title)}" target="_blank" class="block w-full text-center bg-[#1e1e2c] hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-bold py-2.5 rounded-xl border border-purple-500/30 hover:border-transparent transition">
+        <a href="https://wa.me/966${p.phone.replace(/^0/,'')}?text=${encodeURIComponent('السلام عليكم، متواصل معك بخصوص إعلانك في عَتاد: ' + p.title)}" target="_blank" class="block w-full text-center bg-[#1e1e2c] hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-bold py-2.5 rounded-xl border border-purple-500/30 hover:border-transparent transition">
           💬 تواصل عبر الواتساب
         </a>
       </div>
@@ -283,29 +273,11 @@ function calcCommissionNotice(val) {
   document.getElementById("calcFee").textContent = Math.round(price * 0.10);
 }
 
-async function submitAd(e) {
+function submitAd(e) {
   e.preventDefault();
   const btn = document.getElementById("submitBtn");
   btn.disabled = true;
-  btn.textContent = "جاري الحفظ والنشر...";
-
-  const fileInput = document.getElementById("adImageFile");
-  let imageUrl = "";
-
-  if (fileInput.files.length > 0) {
-    const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
-    try {
-      const res = await fetch("https://api.imgbb.com/1/upload?key=6d700a208022c00222f74151b782b5e2", {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      if(data.data && data.data.url) imageUrl = data.data.url;
-    } catch(err) {
-      console.log("Image upload fallback");
-    }
-  }
+  btn.textContent = "جاري النشر...";
 
   const newAd = {
     title: document.getElementById("adTitle").value.trim(),
@@ -313,9 +285,9 @@ async function submitAd(e) {
     city: document.getElementById("adCity").value,
     category: document.getElementById("adCategory").value,
     condition: document.getElementById("adCondition").value,
+    imageUrl: document.getElementById("adImageUrl").value.trim(),
     phone: document.getElementById("adPhone").value.trim(),
     details: document.getElementById("adDetails").value.trim(),
-    imageUrl: imageUrl,
     timestamp: Date.now()
   };
 
@@ -325,9 +297,9 @@ async function submitAd(e) {
     if (!error) {
       document.getElementById("addForm").reset();
       document.getElementById("add-modal").classList.add("hidden");
-      alert("تم نشر إعلانك بنجاح وسيزهر فوراً لجميع المستخدمين!");
+      alert("تم نشر إعلانك بنجاح وظهر في الحراج للجميع!");
     } else {
-      alert("حدث خطأ أثناء النشر، حاول مرة أخرى.");
+      alert("حدث خطأ، تأكد من الاتصال بالإنترنت.");
     }
   });
 }
