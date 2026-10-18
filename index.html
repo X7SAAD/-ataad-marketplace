@@ -1,1 +1,146 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b10">
+<meta name="description" content="عَتاد - سوق القيمنق والـ Setup في السعودية">
+<title>عَتاد | سوق القيمنق والـ Setup</title>
+<style>
+:root{--bg:#0b0b10;--panel:#15151e;--line:#292936;--purple:#9565ff;--text:#f7f6fc;--muted:#a6a3b5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Tahoma,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#101018ed;border-bottom:1px solid var(--line);padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-size:27px;font-weight:900;color:#b69aff}
+.logo span{color:white}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:12px 16px;font-weight:bold}
+.primary{background:var(--purple);color:white}
+.secondary{background:#252532;color:white;border:1px solid var(--line)}
+main{max-width:1100px;margin:auto;padding:24px 16px}
+.hero{padding:38px 25px;border:1px solid #39304d;border-radius:22px;background:radial-gradient(ellipse at top left,#39245d 0%,#171420 48%,#12121a 100%)}
+.hero small{color:#cbb8ff}
+h1{font-size:clamp(30px,6vw,49px);margin:14px 0}
+.hero p{color:#c5c1d2;line-height:1.9;max-width:550px}
+.search{display:flex;gap:10px;margin-top:22px;max-width:650px}
+input,select,textarea{background:#0e0e15;color:white;border:1px solid var(--line);border-radius:10px;padding:13px;width:100%;min-width:0}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:28px 0 15px}
+.section-head h2{margin:0;font-size:21px}
+.categories{display:flex;gap:9px;overflow-x:auto;padding-bottom:5px}
+.cat{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:#eee}
+.cat.active{background:#38245d;border-color:var(--purple)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.product-icon{height:135px;display:grid;place-items:center;font-size:55px;background:linear-gradient(140deg,#29223b,#171720)}
+.card-content{padding:14px}
+.card h3{margin:0 0 9px;font-size:17px}
+.muted{color:var(--muted);font-size:13px}
+.price{font-size:21px;font-weight:bold;color:#c4aaff;margin:13px 0}
+.card button{width:100%}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:30px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+label{display:block;font-size:13px;color:#d5d0e1;margin-bottom:7px}
+.notice{background:#29203c;border:1px solid #483367;padding:12px;border-radius:10px;color:#d8c8ff;font-size:13px;line-height:1.8}
+footer{text-align:center;color:var(--muted);padding:30px 15px;border-top:1px solid var(--line);margin-top:35px;font-size:13px}
+.empty{color:var(--muted);text-align:center;padding:25px;grid-column:1/-1}
+@media(max-width:520px){header{padding:12px 4%}.logo{font-size:23px}.hero{padding:28px 17px}.search{flex-direction:column}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">عَتاد<span>.</span></div>
+  <button class="primary" onclick="document.getElementById('add').scrollIntoView({behavior:'smooth'})">+ أضف إعلانك</button>
+</header>
+<main>
+  <section class="hero">
+    <small>🎮 سوق القيمنق والـ Setup في السعودية</small>
+    <h1>عتادك الجديد،<br>مكانه هنا.</h1>
+    <p>اكتشف معدات القيمنق والسيت أب، وقارن الخيارات، واستعد لتطوير تجربتك.</p>
+    <div class="search">
+      <input id="search" placeholder="ابحث عن شاشة، كيبورد، سماعة..." oninput="render()">
+      <button class="primary" onclick="render()">ابحث</button>
+    </div>
+  </section>
+
+  <div class="section-head"><h2>تصفح الأقسام</h2></div>
+  <div class="categories" id="categories">
+    <button class="cat active" onclick="setCat('الكل',this)">الكل</button>
+    <button class="cat" onclick="setCat('شاشات',this)">🖥️ شاشات</button>
+    <button class="cat" onclick="setCat('أجهزة',this)">🎮 أجهزة</button>
+    <button class="cat" onclick="setCat('إكسسوارات',this)">⌨️ إكسسوارات</button>
+    <button class="cat" onclick="setCat('صوتيات',this)">🎧 صوتيات</button>
+    <button class="cat" onclick="setCat('سيت أب',this)">💡 سيت أب</button>
+  </div>
+
+  <div class="section-head"><h2>الإعلانات</h2><span class="muted" id="count"></span></div>
+  <div class="grid" id="products"></div>
+
+  <section class="panel" id="add">
+    <h2 style="margin-top:0">أضف إعلانك</h2>
+    <p class="muted">اعرض قطعتك للبيع في نموذج تجريبي.</p>
+    <div class="notice">تنبيه: هذه نسخة أولية. الإعلانات التي تضيفها تظهر على جهازك وفي الصفحة الحالية فقط، ولا تُنشر للناس بعد. لا تضع بيانات شخصية حساسة.</div>
+    <form id="adForm" style="margin-top:18px">
+      <div class="form-grid">
+        <div><label for="name">اسم المنتج</label><input id="name" required maxlength="70" placeholder="مثال: شاشة قيمنق 180Hz"></div>
+        <div><label for="price">السعر بالريال</label><input id="price" type="number" required min="1" max="1000000" placeholder="مثال: 450"></div>
+        <div><label for="category">القسم</label><select id="category"><option>شاشات</option><option>أجهزة</option><option>إكسسوارات</option><option>صوتيات</option><option>سيت أب</option></select></div>
+        <div><label for="condition">الحالة</label><select id="condition"><option>مستعمل</option><option>جديد</option></select></div>
+        <div class="full"><label for="details">وصف المنتج</label><textarea id="details" rows="3" maxlength="300" placeholder="اكتب وصفًا مختصرًا للمنتج"></textarea></div>
+        <div class="full"><button class="primary" type="submit">إضافة الإعلان للتجربة</button></div>
+      </div>
+    </form>
+  </section>
+</main>
+<footer>عَتاد © 2026 — سوق القيمنق والـ Setup في السعودية<br>نسخة تجريبية أولية</footer>
+
+<script>
+const products = [
+ {name:"شاشة قيمنق 180Hz",price:480,category:"شاشات",condition:"مستعمل",details:"شاشة مناسبة للقيمنق",icon:"🖥️"},
+ {name:"يد تحكم",price:180,category:"أجهزة",condition:"مستعمل",details:"يد تحكم للألعاب",icon:"🎮"},
+ {name:"كيبورد ميكانيكي",price:220,category:"إكسسوارات",condition:"جديد",details:"كيبورد للسيت أب",icon:"⌨️"},
+ {name:"سماعة قيمنق",price:150,category:"صوتيات",condition:"مستعمل",details:"سماعة للألعاب",icon:"🎧"},
+ {name:"إضاءة RGB",price:65,category:"سيت أب",condition:"جديد",details:"إضاءة لتزيين السيت أب",icon:"💡"}
+];
+let activeCat="الكل";
+function setCat(cat,btn){
+ activeCat=cat;
+ document.querySelectorAll(".cat").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ render();
+}
+function render(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const filtered=products.filter(p=>(activeCat==="الكل"||p.category===activeCat)&&(p.name+" "+p.category+" "+p.details).toLowerCase().includes(q));
+ document.getElementById("count").textContent=filtered.length+" إعلان";
+ const root=document.getElementById("products");
+ root.replaceChildren();
+ if(!filtered.length){const e=document.createElement("div");e.className="empty";e.textContent="ما لقينا نتائج. جرّب كلمة ثانية.";root.appendChild(e);return;}
+ filtered.forEach(p=>{
+  const card=document.createElement("article");card.className="card";
+  const icon=document.createElement("div");icon.className="product-icon";icon.textContent=p.icon||"📦";
+  const content=document.createElement("div");content.className="card-content";
+  const h=document.createElement("h3");h.textContent=p.name;
+  const meta=document.createElement("div");meta.className="muted";meta.textContent=p.category+" • "+p.condition;
+  const desc=document.createElement("p");desc.className="muted";desc.textContent=p.details||"بدون وصف";
+  const price=document.createElement("div");price.className="price";price.textContent=Number(p.price).toLocaleString("ar-SA")+" ر.س";
+  const btn=document.createElement("button");btn.className="secondary";btn.textContent="تفاصيل الإعلان";btn.onclick=()=>alert(p.name+"\nالسعر: "+p.price+" ريال\n"+(p.details||""));
+  content.append(h,meta,desc,price,btn);card.append(icon,content);root.appendChild(card);
+ });
+}
+document.getElementById("adForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const name=document.getElementById("name").value.trim();
+ const price=Number(document.getElementById("price").value);
+ if(!name||!Number.isFinite(price)||price<=0){alert("تأكد من اسم المنتج والسعر");return;}
+ const icons={"شاشات":"🖥️","أجهزة":"🎮","إكسسوارات":"⌨️","صوتيات":"🎧","سيت أب":"💡"};
+ products.unshift({name,price,category:document.getElementById("category").value,condition:document.getElementById("condition").value,details:document.getElementById("details").value.trim(),icon:icons[document.getElementById("category").value]||"📦"});
+ e.target.reset();activeCat="الكل";document.querySelectorAll(".cat").forEach(b=>b.classList.remove("active"));document.querySelector(".cat").classList.add("active");render();
+ document.getElementById("products").scrollIntoView({behavior:"smooth"});
+});
+render();
+</script>
+</body>
+</html>
+
