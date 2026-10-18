@@ -7,32 +7,55 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Tajawal', sans-serif; }
+</style>
 </head>
 <body class="bg-[#0b0b10] text-white min-h-screen p-4">
 
   <div class="max-w-xl mx-auto">
-    <header class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-black text-purple-400">عَتاد .</h1>
-      <button onclick="document.getElementById('modal').classList.toggle('hidden')" class="bg-purple-600 px-4 py-2 rounded-xl font-bold text-sm">+ أضف إعلان</button>
+    <!-- الهيدر -->
+    <header class="flex justify-between items-center mb-6 bg-[#15151f]/80 backdrop-blur-md p-4 rounded-2xl border border-purple-500/20 shadow-lg shadow-purple-900/10">
+      <div>
+        <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">عَتاد .</h1>
+        <p class="text-xs text-gray-400">حراج مستلزمات القيمنق</p>
+      </div>
+      <button onclick="document.getElementById('modal').classList.toggle('hidden')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all">+ أضف إعلان</button>
     </header>
 
-    <!-- الإعلانات -->
+    <!-- قائمة الإعلانات -->
     <div id="grid" class="space-y-3">
-      <p class="text-center text-gray-400 py-6">جاري تحميل الإعلانات من السيرفر...</p>
+      <div class="text-center text-gray-400 py-12 bg-[#15151f]/40 rounded-2xl border border-dashed border-gray-800">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
+        جاري تحميل الإعلانات من السيرفر...
+      </div>
     </div>
   </div>
 
   <!-- نافذة الإضافة -->
-  <div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-[#15151f] p-5 rounded-2xl w-full max-w-md border border-purple-500/30">
-      <h3 class="font-bold text-lg mb-3">إضافة إعلان جديد</h3>
-      <form onsubmit="postAd(event)" class="space-y-3">
-        <input required id="title" type="text" placeholder="اسم السلعة (مثال: شاشة 144hz)" class="w-full bg-[#0d0d14] border border-gray-700 p-3 rounded-xl text-sm">
-        <input required id="price" type="number" placeholder="السعر بالريال" class="w-full bg-[#0d0d14] border border-gray-700 p-3 rounded-xl text-sm">
-        <input required id="phone" type="tel" placeholder="رقم الواتساب (05xxxxxxxx)" class="w-full bg-[#0d0d14] border border-gray-700 p-3 rounded-xl text-sm">
+  <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-[#15151f] p-6 rounded-3xl w-full max-w-md border border-purple-500/30 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-lg text-purple-300">إضافة إعلان جديد</h3>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400 hover:text-white">&times;</button>
+      </div>
+      <form onsubmit="postAd(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">اسم السلعة</label>
+          <input required id="title" type="text" placeholder="مثال: شاشة 144hz أو كرت شاشة" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">السعر</label>
+          <input required id="price" type="number" placeholder="السعر بالريال" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">رقم الواتساب</label>
+          <input required id="phone" type="tel" placeholder="05xxxxxxxx" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
         <div class="flex gap-2 pt-2">
-          <button type="button" onclick="document.getElementById('modal').classList.add('hidden')" class="w-1/2 bg-gray-800 py-2.5 rounded-xl text-sm">إلغاء</button>
-          <button type="submit" id="subBtn" class="w-1/2 bg-purple-600 py-2.5 rounded-xl font-bold text-sm">نشر بالسيرفر</button>
+          <button type="button" onclick="document.getElementById('modal').classList.add('hidden')" class="w-1/2 bg-gray-800 hover:bg-gray-700 py-3 rounded-xl text-sm font-bold transition-all">إلغاء</button>
+          <button type="submit" id="subBtn" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/20 transition-all">نشر بالسيرفر</button>
         </div>
       </form>
     </div>
@@ -52,13 +75,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// استقبال الإعلانات فورياً وحقيقياً من السيرفر
+// استقبال الإعلانات
 db.ref('listings').on('value', (snapshot) => {
   const data = snapshot.val();
   const grid = document.getElementById('grid');
   
   if (!data) {
-    grid.innerHTML = '<p class="text-center text-gray-500 py-6">ما فيه إعلانات حالياً، كن أول من يضيف إعلان!</p>';
+    grid.innerHTML = '<div class="text-center text-gray-500 py-12 bg-[#15151f]/30 rounded-2xl border border-gray-800">ما فيه إعلانات حالياً، كن أول من يضيف إعلان!</div>';
     return;
   }
 
@@ -66,19 +89,22 @@ db.ref('listings').on('value', (snapshot) => {
   Object.keys(data).reverse().forEach(key => {
     let item = data[key];
     html += `
-      <div class="bg-[#15151f] border border-gray-800 p-4 rounded-2xl flex justify-between items-center">
+      <div class="bg-[#15151f] border border-purple-500/10 hover:border-purple-500/30 p-4 rounded-2xl flex justify-between items-center transition-all shadow-md">
         <div>
-          <h3 class="font-bold text-white">${item.title}</h3>
+          <h3 class="font-bold text-white text-base">${item.title}</h3>
           <p class="text-purple-400 font-black text-sm mt-1">${item.price} ر.س</p>
         </div>
-        <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-purple-900/40 border border-purple-500/30 text-purple-300 px-3 py-2 rounded-xl text-xs font-bold">واتساب</a>
+        <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600/30 transition-all">واتساب</a>
       </div>
     `;
   });
   grid.innerHTML = html;
+}, (error) => {
+  console.error(error);
+  document.getElementById('grid').innerHTML = '<div class="text-center text-red-400 py-6 bg-[#15151f]/40 rounded-2xl border border-red-500/20">خطأ في الاتصال بقاعدة البيانات</div>';
 });
 
-// إرسال الإعلان للسيرفر بشكل حقيقي
+// إرسال الإعلان
 function postAd(e) {
   e.preventDefault();
   const btn = document.getElementById('subBtn');
@@ -101,7 +127,7 @@ function postAd(e) {
       document.getElementById('price').value = '';
       document.getElementById('phone').value = '';
     } else {
-      alert("صار خطأ في النشر، تأكد من قواعد فايربيس");
+      alert("صار خطأ في النشر: " + error.message);
     }
   });
 }
