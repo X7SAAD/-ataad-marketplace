@@ -19,7 +19,7 @@
     <header class="flex justify-between items-center mb-6 bg-[#15151f]/80 backdrop-blur-md p-4 rounded-2xl border border-purple-500/20 shadow-lg shadow-purple-900/10">
       <div>
         <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">عَتاد .</h1>
-        <p class="text-xs text-gray-400">حراج مستلزمات القيمنق</p>
+        <p class="text-xs text-gray-400">حراج مستلزمات القيمنق الرسمي</p>
       </div>
       <button onclick="document.getElementById('modal').classList.toggle('hidden')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all">+ أضف إعلان</button>
     </header>
@@ -33,25 +33,37 @@
     </div>
   </div>
 
-  <!-- نافذة الإضافة -->
-  <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-[#15151f] p-6 rounded-3xl w-full max-w-md border border-purple-500/30 shadow-2xl">
+  <!-- نافذة إضافة إعلان -->
+  <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-[#15151f] p-6 rounded-3xl w-full max-w-md border border-purple-500/30 shadow-2xl my-8">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold text-lg text-purple-300">إضافة إعلان جديد</h3>
-        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400 hover:text-white">&times;</button>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400 hover:text-white text-xl">&times;</button>
       </div>
       <form onsubmit="postAd(event)" class="space-y-4">
         <div>
-          <label class="block text-xs text-gray-400 mb-1">اسم السلعة</label>
-          <input required id="title" type="text" placeholder="مثال: شاشة 144hz أو كرت شاشة" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">اسم السلعة / الجهاز</label>
+          <input required id="title" type="text" placeholder="مثال: شاشة Odyssey G7 240Hz" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
         </div>
         <div>
-          <label class="block text-xs text-gray-400 mb-1">السعر</label>
-          <input required id="price" type="number" placeholder="السعر بالريال" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">السعر (ريال)</label>
+          <input required id="price" type="number" placeholder="مثال: 1200" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
         </div>
         <div>
-          <label class="block text-xs text-gray-400 mb-1">رقم الواتساب</label>
+          <label class="block text-xs text-gray-400 mb-1">رابط صورة السلعة (رابط مباشر)</label>
+          <input id="image" type="url" placeholder="https://example.com/image.jpg" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">رقم الواتساب (للتواصل)</label>
           <input required id="phone" type="tel" placeholder="05xxxxxxxx" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">معلومات الدفع / الإيبان (اختياري)</label>
+          <input id="iban" type="text" placeholder="SA0000000000000000000000 أو اسم البنك" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">وصف إضافي</label>
+          <textarea id="desc" rows="2" placeholder="تفاصيل نظافة القطعة، الضمان، إلخ..." class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all"></textarea>
         </div>
         <div class="flex gap-2 pt-2">
           <button type="button" onclick="document.getElementById('modal').classList.add('hidden')" class="w-1/2 bg-gray-800 hover:bg-gray-700 py-3 rounded-xl text-sm font-bold transition-all">إلغاء</button>
@@ -75,7 +87,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// استقبال الإعلانات
+// استقبال الإعلانات بكامل تفاصيلها
 db.ref('listings').on('value', (snapshot) => {
   const data = snapshot.val();
   const grid = document.getElementById('grid');
@@ -89,12 +101,17 @@ db.ref('listings').on('value', (snapshot) => {
   Object.keys(data).reverse().forEach(key => {
     let item = data[key];
     html += `
-      <div class="bg-[#15151f] border border-purple-500/10 hover:border-purple-500/30 p-4 rounded-2xl flex justify-between items-center transition-all shadow-md">
-        <div>
-          <h3 class="font-bold text-white text-base">${item.title}</h3>
-          <p class="text-purple-400 font-black text-sm mt-1">${item.price} ر.س</p>
+      <div class="bg-[#15151f] border border-purple-500/15 hover:border-purple-500/30 p-4 rounded-2xl space-y-3 transition-all shadow-md">
+        ${item.image ? `<img src="${item.image}" class="w-full h-48 object-cover rounded-xl border border-gray-800" onerror="this.style.display='none'">` : ''}
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold text-white text-base">${item.title}</h3>
+            <p class="text-purple-400 font-black text-sm mt-1">${item.price} ر.س</p>
+          </div>
+          <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600/30 transition-all">واتساب</a>
         </div>
-        <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600/30 transition-all">واتساب</a>
+        ${item.desc ? `<p class="text-xs text-gray-300 bg-[#0d0d14] p-2.5 rounded-xl border border-gray-800/60">${item.desc}</p>` : ''}
+        ${item.iban ? `<div class="text-[11px] text-gray-400 bg-purple-950/20 border border-purple-500/20 p-2 rounded-lg flex justify-between items-center"><span>الإيبان/البنك: <b class="text-purple-300">${item.iban}</b></span></div>` : ''}
       </div>
     `;
   });
@@ -104,7 +121,7 @@ db.ref('listings').on('value', (snapshot) => {
   document.getElementById('grid').innerHTML = '<div class="text-center text-red-400 py-6 bg-[#15151f]/40 rounded-2xl border border-red-500/20">خطأ في الاتصال بقاعدة البيانات</div>';
 });
 
-// إرسال الإعلان
+// إرسال الإعلان مع كل البيانات
 function postAd(e) {
   e.preventDefault();
   const btn = document.getElementById('subBtn');
@@ -114,7 +131,10 @@ function postAd(e) {
   const newAd = {
     title: document.getElementById('title').value.trim(),
     price: document.getElementById('price').value.trim(),
+    image: document.getElementById('image').value.trim(),
     phone: document.getElementById('phone').value.trim(),
+    iban: document.getElementById('iban').value.trim(),
+    desc: document.getElementById('desc').value.trim(),
     time: Date.now()
   };
 
@@ -123,9 +143,13 @@ function postAd(e) {
     btn.textContent = "نشر بالسيرفر";
     if (!error) {
       document.getElementById('modal').classList.add('hidden');
+      // تصفير الحقول
       document.getElementById('title').value = '';
       document.getElementById('price').value = '';
+      document.getElementById('image').value = '';
       document.getElementById('phone').value = '';
+      document.getElementById('iban').value = '';
+      document.getElementById('desc').value = '';
     } else {
       alert("صار خطأ في النشر: " + error.message);
     }
