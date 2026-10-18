@@ -14,18 +14,18 @@
 </head>
 <body class="bg-[#0b0b10] text-white min-h-screen p-4">
 
-  <div class="max-w-xl mx-auto">
+  <div class="max-w-2xl mx-auto">
     <!-- الهيدر -->
-    <header class="flex justify-between items-center mb-6 bg-[#15151f]/80 backdrop-blur-md p-4 rounded-2xl border border-purple-500/20 shadow-lg shadow-purple-900/10">
+    <header class="flex justify-between items-center mb-6 bg-[#15151f]/90 backdrop-blur-md p-4 rounded-2xl border border-purple-500/30 shadow-lg shadow-purple-900/20">
       <div>
         <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">عَتاد .</h1>
-        <p class="text-xs text-gray-400">حراج مستلزمات القيمنق الرسمي</p>
+        <p class="text-xs text-gray-400">حراج مستلزمات القيمنق (عمولة المنصة 10%)</p>
       </div>
-      <button onclick="document.getElementById('modal').classList.toggle('hidden')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all">+ أضف إعلان</button>
+      <button onclick="document.getElementById('modal').classList.remove('hidden')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30 transition-all">+ أضف إعلان</button>
     </header>
 
     <!-- قائمة الإعلانات -->
-    <div id="grid" class="space-y-3">
+    <div id="grid" class="space-y-4">
       <div class="text-center text-gray-400 py-12 bg-[#15151f]/40 rounded-2xl border border-dashed border-gray-800">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
         جاري تحميل الإعلانات من السيرفر...
@@ -35,39 +35,61 @@
 
   <!-- نافذة إضافة إعلان -->
   <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
-    <div class="bg-[#15151f] p-6 rounded-3xl w-full max-w-md border border-purple-500/30 shadow-2xl my-8">
+    <div class="bg-[#15151f] p-6 rounded-3xl w-full max-w-lg border border-purple-500/30 shadow-2xl my-8">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold text-lg text-purple-300">إضافة إعلان جديد</h3>
-        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
       </div>
-      <form onsubmit="postAd(event)" class="space-y-4">
+      
+      <form onsubmit="postAd(event)" class="space-y-3">
+        <!-- اسم السلعة -->
         <div>
-          <label class="block text-xs text-gray-400 mb-1">اسم السلعة / الجهاز</label>
-          <input required id="title" type="text" placeholder="مثال: شاشة Odyssey G7 240Hz" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">اسم السلعة / الجهاز *</label>
+          <input required id="title" type="text" placeholder="مثال: بي سي قيمنق RTX 4070 / شاشة 240Hz" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
         </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <!-- السعر -->
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">السعر (ريال) *</label>
+            <input required id="price" type="number" placeholder="مثال: 2500" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
+          </div>
+          <!-- المدينة -->
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">المدينة *</label>
+            <input required id="city" type="text" placeholder="مثال: الأحساء / الرياض" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
+          </div>
+        </div>
+
+        <!-- أرفاق صورة -->
         <div>
-          <label class="block text-xs text-gray-400 mb-1">السعر (ريال)</label>
-          <input required id="price" type="number" placeholder="مثال: 1200" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">صورة السلعة (اختر صورة من جهازك أو ضع رابط)</label>
+          <input id="imgFile" type="file" accept="image/*" class="w-full bg-[#0d0d14] border border-gray-800 p-2 rounded-xl text-xs text-gray-300 mb-2">
+          <input id="imgUrl" type="url" placeholder="أو ضع رابط صورة مباشر هنا" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
         </div>
+
+        <!-- رقم الواتساب -->
         <div>
-          <label class="block text-xs text-gray-400 mb-1">رابط صورة السلعة (رابط مباشر)</label>
-          <input id="image" type="url" placeholder="https://example.com/image.jpg" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">رقم الواتساب للتواصل *</label>
+          <input required id="phone" type="tel" placeholder="05xxxxxxxx" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
         </div>
+
+        <!-- معلومات حساب البائع والإيبان -->
         <div>
-          <label class="block text-xs text-gray-400 mb-1">رقم الواتساب (للتواصل)</label>
-          <input required id="phone" type="tel" placeholder="05xxxxxxxx" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">حسابك/إيبانك الخاص لاستلام قيمة السلعة (اختياري)</label>
+          <input id="iban" type="text" placeholder="SA0000000000000000000000" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none">
         </div>
+
+        <!-- تفاصيل ووصف السلعة -->
         <div>
-          <label class="block text-xs text-gray-400 mb-1">معلومات الدفع / الإيبان (اختياري)</label>
-          <input id="iban" type="text" placeholder="SA0000000000000000000000 أو اسم البنك" class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all">
+          <label class="block text-xs text-gray-400 mb-1">تفاصيل ومواصفات السلعة</label>
+          <textarea id="desc" rows="2" placeholder="حالة الجهاز، مدة الاستخدام، وجود كرتون أو ضمان..." class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none"></textarea>
         </div>
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">وصف إضافي</label>
-          <textarea id="desc" rows="2" placeholder="تفاصيل نظافة القطعة، الضمان، إلخ..." class="w-full bg-[#0d0d14] border border-gray-800 focus:border-purple-500 p-3 rounded-xl text-sm outline-none transition-all"></textarea>
-        </div>
+
+        <!-- أزرار الإرسال -->
         <div class="flex gap-2 pt-2">
-          <button type="button" onclick="document.getElementById('modal').classList.add('hidden')" class="w-1/2 bg-gray-800 hover:bg-gray-700 py-3 rounded-xl text-sm font-bold transition-all">إلغاء</button>
-          <button type="submit" id="subBtn" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/20 transition-all">نشر بالسيرفر</button>
+          <button type="button" onclick="document.getElementById('modal').classList.add('hidden')" class="w-1/2 bg-gray-800 hover:bg-gray-700 py-3 rounded-xl text-sm font-bold">إلغاء</button>
+          <button type="submit" id="subBtn" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-sm shadow-lg shadow-purple-600/30">نشر الإعلان</button>
         </div>
       </form>
     </div>
@@ -84,16 +106,18 @@ const firebaseConfig = {
   appId: "1:377335674970:web:1c60df..."
 };
 
-firebase.initializeApp(firebaseConfig);
+try {
+  firebase.initializeApp(firebaseConfig);
+} catch(e) {}
 const db = firebase.database();
 
-// استقبال الإعلانات بكامل تفاصيلها
+// عرض الإعلانات تلقائياً
 db.ref('listings').on('value', (snapshot) => {
   const data = snapshot.val();
   const grid = document.getElementById('grid');
   
   if (!data) {
-    grid.innerHTML = '<div class="text-center text-gray-500 py-12 bg-[#15151f]/30 rounded-2xl border border-gray-800">ما فيه إعلانات حالياً، كن أول من يضيف إعلان!</div>';
+    grid.innerHTML = '<div class="text-center text-gray-500 py-12 bg-[#15151f]/30 rounded-2xl border border-gray-800">لا يوجد إعلانات حالياً، كن أول من يضيف إعلاناً!</div>';
     return;
   }
 
@@ -101,58 +125,92 @@ db.ref('listings').on('value', (snapshot) => {
   Object.keys(data).reverse().forEach(key => {
     let item = data[key];
     html += `
-      <div class="bg-[#15151f] border border-purple-500/15 hover:border-purple-500/30 p-4 rounded-2xl space-y-3 transition-all shadow-md">
-        ${item.image ? `<img src="${item.image}" class="w-full h-48 object-cover rounded-xl border border-gray-800" onerror="this.style.display='none'">` : ''}
+      <div class="bg-[#15151f] border border-purple-500/20 p-4 rounded-2xl space-y-3 shadow-md">
+        ${item.image ? `<img src="${item.image}" class="w-full h-52 object-cover rounded-xl border border-gray-800" onerror="this.style.display='none'">` : ''}
         <div class="flex justify-between items-start">
           <div>
             <h3 class="font-bold text-white text-base">${item.title}</h3>
-            <p class="text-purple-400 font-black text-sm mt-1">${item.price} ر.س</p>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-purple-400 font-black text-sm">${item.price} ر.س</span>
+              ${item.city ? `<span class="bg-gray-800 text-gray-300 text-[10px] px-2 py-0.5 rounded-md">📍 ${item.city}</span>` : ''}
+            </div>
           </div>
-          <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600/30 transition-all">واتساب</a>
+          <a href="https://wa.me/966${item.phone.replace(/^0/,'')}" target="_blank" class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600/30 transition-all">واتساب</a>
         </div>
-        ${item.desc ? `<p class="text-xs text-gray-300 bg-[#0d0d14] p-2.5 rounded-xl border border-gray-800/60">${item.desc}</p>` : ''}
-        ${item.iban ? `<div class="text-[11px] text-gray-400 bg-purple-950/20 border border-purple-500/20 p-2 rounded-lg flex justify-between items-center"><span>الإيبان/البنك: <b class="text-purple-300">${item.iban}</b></span></div>` : ''}
+        ${item.desc ? `<p class="text-xs text-gray-300 bg-[#0d0d14] p-2.5 rounded-xl border border-gray-800">${item.desc}</p>` : ''}
+        ${item.iban ? `<div class="text-[11px] text-gray-400 bg-purple-950/20 border border-purple-500/20 p-2.5 rounded-xl">حساب البائع: <b class="text-purple-300 select-all">${item.iban}</b></div>` : ''}
+        
+        <!-- معلومات تحويل رسوم الموقع 10% -->
+        <div class="text-[11px] bg-purple-950/40 border border-purple-500/30 p-2.5 rounded-xl space-y-1 text-gray-300">
+          <div class="flex justify-between font-bold text-purple-300">
+            <span>تحويل رسوم المنصة (10%)</span>
+            <span>مصرف الراجحي</span>
+          </div>
+          <div>اسم المستفيد: <b>سعد سامي صالح العديل</b></div>
+          <div>الإيبان: <b class="text-purple-200 select-all font-mono">SA6180000308 08010670122</b></div>
+        </div>
       </div>
     `;
   });
   grid.innerHTML = html;
-}, (error) => {
-  console.error(error);
-  document.getElementById('grid').innerHTML = '<div class="text-center text-red-400 py-6 bg-[#15151f]/40 rounded-2xl border border-red-500/20">خطأ في الاتصال بقاعدة البيانات</div>';
+}, (err) => {
+  document.getElementById('grid').innerHTML = `<div class="text-center text-red-400 py-6 bg-red-950/20 rounded-2xl border border-red-500/30">خطأ في جلب البيانات: ${err.message}</div>`;
 });
 
-// إرسال الإعلان مع كل البيانات
+// تحويل ملف الصورة
+function processImage(fileInput, urlInput, callback) {
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => callback(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    callback(urlInput.value.trim());
+  }
+}
+
+// نشر الإعلان
 function postAd(e) {
   e.preventDefault();
   const btn = document.getElementById('subBtn');
   btn.disabled = true;
   btn.textContent = "جاري النشر...";
 
-  const newAd = {
-    title: document.getElementById('title').value.trim(),
-    price: document.getElementById('price').value.trim(),
-    image: document.getElementById('image').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-    iban: document.getElementById('iban').value.trim(),
-    desc: document.getElementById('desc').value.trim(),
-    time: Date.now()
-  };
+  const fileInput = document.getElementById('imgFile');
+  const urlInput = document.getElementById('imgUrl');
 
-  db.ref('listings').push(newAd, (error) => {
-    btn.disabled = false;
-    btn.textContent = "نشر بالسيرفر";
-    if (!error) {
-      document.getElementById('modal').classList.add('hidden');
-      // تصفير الحقول
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image').value = '';
-      document.getElementById('phone').value = '';
-      document.getElementById('iban').value = '';
-      document.getElementById('desc').value = '';
-    } else {
-      alert("صار خطأ في النشر: " + error.message);
-    }
+  processImage(fileInput, urlInput, (imgData) => {
+    const newAd = {
+      title: document.getElementById('title').value.trim(),
+      price: document.getElementById('price').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      image: imgData || '',
+      phone: document.getElementById('phone').value.trim(),
+      iban: document.getElementById('iban').value.trim(),
+      desc: document.getElementById('desc').value.trim(),
+      time: Date.now()
+    };
+
+    db.ref('listings').push(newAd)
+      .then(() => {
+        btn.disabled = false;
+        btn.textContent = "نشر الإعلان";
+        document.getElementById('modal').classList.add('hidden');
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('city').value = '';
+        document.getElementById('imgFile').value = '';
+        document.getElementById('imgUrl').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('iban').value = '';
+        document.getElementById('desc').value = '';
+        alert("تم نشر الإعلان بنجاح!");
+      })
+      .catch((error) => {
+        btn.disabled = false;
+        btn.textContent = "نشر الإعلان";
+        alert("تعذر النشر! السبب: " + error.message);
+      });
   });
 }
 </script>
