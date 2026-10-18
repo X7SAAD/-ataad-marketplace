@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#0b0b10">
 <title>عَتاد | حراج القيمنق والـ Setup</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
 :root { --bg: #0b0b10; --panel: #15151e; --line: #292936; --purple: #9565ff; }
 body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -apple-system, sans-serif; }
@@ -73,7 +76,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
     <h2 class="text-xl font-bold text-white flex items-center gap-2">
       <span>⚡</span> أحدث الإعلانات المعروضة
     </h2>
-    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">0 إعلان معروض</span>
+    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">جاري الاتصال بالسحاب...</span>
   </div>
 
   <!-- Product Grid -->
@@ -85,7 +88,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
   <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-lg rounded-3xl p-6 relative my-8">
     <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
     <h3 class="text-xl font-bold text-white mb-1">إضافة إعلان جديد للحراج 🚀</h3>
-    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة وسيتم نشرها لتظهر للجميع فوراً.</p>
+    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة وسيتم نشرها لتظهر لجميع الزوار فوراً.</p>
     
     <form id="addForm" onsubmit="submitAd(event)" class="space-y-3">
       <div>
@@ -190,9 +193,14 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
 </div>
 
 <script>
-const STORAGE_KEY = 'atad_public_global_listings_v3';
-let allProducts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+// إعداد اتصال قاعدة البيانات السحابية العامة
+const firebaseConfig = {
+  databaseURL: "https://atad-gaming-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
+let allProducts = [];
 let activeCategory = "الكل";
 const categories = ["الكل", "🖥️ شاشات وستاندات", "🎮 أجهزة وكونسول / PC", "⌨️ كيبوردات وماوسات", "🎧 صوتيات ومايكات", "💡 طاولات وإضاءات", "📦 قطع وإكسسوارات"];
 
@@ -211,9 +219,20 @@ function setCategory(cat) {
   filterProducts();
 }
 
+// الاستماع المباشر للتغييرات السحابية (تحديث فوري لجميع الأجهزة)
+db.ref('listings').on('value', (snapshot) => {
+  const data = snapshot.val();
+  allProducts = [];
+  if (data) {
+    Object.keys(data).forEach(key => {
+      allProducts.push({ id: key, ...data[key] });
+    });
+    allProducts.sort((a, b) => b.timestamp - a.timestamp);
+  }
+  filterProducts();
+});
+
 function filterProducts() {
-  allProducts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  
   const q = document.getElementById("searchInput").value.trim().toLowerCase();
   const city = document.getElementById("cityFilter").value;
 
@@ -250,7 +269,7 @@ function filterProducts() {
         <a href="https://wa.me/966${p.phone.replace(/^0/,'')}?text=${encodeURIComponent('السلام عليكم، متواصل معك بخصوص إعلانك في عَتاد: ' + p.title)}" target="_blank" class="block w-full text-center bg-[#1e1e2c] hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-bold py-2.5 rounded-xl border border-purple-500/30 hover:border-transparent transition">
           💬 تواصل عبر الواتساب
         </a>
-        <button onclick="deleteAd(${p.id})" class="w-full text-center bg-red-950/30 hover:bg-red-900/50 text-red-300 text-[11px] font-semibold py-1.5 rounded-lg border border-red-500/20 transition">
+        <button onclick="deleteAd('${p.id}')" class="w-full text-center bg-red-950/30 hover:bg-red-900/50 text-red-300 text-[11px] font-semibold py-1.5 rounded-lg border border-red-500/20 transition">
           🗑️ حذف الإعلان (تم البيع)
         </button>
       </div>
@@ -266,21 +285,23 @@ function calcCommissionNotice(val) {
 function submitAd(e) {
   e.preventDefault();
   const fileInput = document.getElementById("adImageFile");
-  
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "جاري النشر سحابياً...";
+
   if (fileInput.files && fileInput.files[0]) {
     const reader = new FileReader();
     reader.onload = function(uploadEvent) {
-      saveNewAd(uploadEvent.target.result);
+      saveToCloud(uploadEvent.target.result);
     };
     reader.readAsDataURL(fileInput.files[0]);
   } else {
-    saveNewAd("");
+    saveToCloud("");
   }
 }
 
-function saveNewAd(imageUrl) {
+function saveToCloud(imageUrl) {
   const newAd = {
-    id: Date.now(),
     title: document.getElementById("adTitle").value.trim(),
     price: Number(document.getElementById("adPrice").value),
     city: document.getElementById("adCity").value,
@@ -292,20 +313,24 @@ function saveNewAd(imageUrl) {
     timestamp: Date.now()
   };
 
-  allProducts.unshift(newAd);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
-
-  document.getElementById("addForm").reset();
-  document.getElementById("add-modal").classList.add("hidden");
-  filterProducts();
-  alert("تم نشر إعلانك وظهر للجميع في الحراج فوراً! 🚀");
+  db.ref('listings').push(newAd, (error) => {
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = false;
+    btn.textContent = "نشر الإعلان فوراً للجميع 📢";
+    
+    if (!error) {
+      document.getElementById("addForm").reset();
+      document.getElementById("add-modal").classList.add("hidden");
+      alert("تم نشر الإعلان سحابياً وسيظهر فوراً في كل الأجهزة! 🚀");
+    } else {
+      alert("حدث خطأ في الاتصال، تأكد من الإنترنت.");
+    }
+  });
 }
 
 function deleteAd(id) {
   if (confirm("هل أنت متأكد من حذف هذا الإعلان (تم إتمام البيع)؟")) {
-    allProducts = allProducts.filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
-    filterProducts();
+    db.ref('listings/' + id).remove();
   }
 }
 
@@ -316,8 +341,6 @@ function copyIban() {
 }
 
 renderCategories();
-filterProducts();
-setInterval(filterProducts, 2000);
 </script>
 </body>
 </html>
