@@ -61,3 +61,278 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
           <option value="عسير / الجنوب">عسير / الجنوب</option>
           <option value="أخرى">مدينة أخرى</option>
         </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <div class="my-8">
+    <h2 class="text-lg font-bold text-gray-200 mb-3 flex items-center gap-2">
+      <span>📂</span> الأقسام
+    </h2>
+    <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar" id="categoriesContainer">
+      <!-- Generated Dynamically -->
+    </div>
+  </div>
+
+  <!-- Listings Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <span>⚡</span> أحدث الإعلانات المعروضة
+    </h2>
+    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">جاري التحميل...</span>
+  </div>
+
+  <!-- Product Grid -->
+  <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <!-- Dynamic Cards -->
+  </div>
+</main>
+
+<!-- Modal: Add New Listing -->
+<div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+  <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-lg rounded-3xl p-6 relative my-8">
+    <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
+    <h3 class="text-xl font-bold text-white mb-1">إضافة إعلان جديد للحراج 🚀</h3>
+    <p class="text-xs text-gray-400 mb-4">سعر إعلانك يعبر عن قيمتك، ويظهر فوراً لجميع زوار المنصة.</p>
+    
+    <form id="addForm" onsubmit="submitAd(event)" class="space-y-3">
+      <div>
+        <label class="block text-xs font-semibold text-gray-300 mb-1">اسم المنتج / السلعة *</label>
+        <input required id="adTitle" type="text" placeholder="مثال: شاشة زوي 240Hz مستعملة نظيفة" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">السعر (ريال) *</label>
+          <input required id="adPrice" type="number" min="1" oninput="calcCommissionNotice(this.value)" placeholder="مثال: 850" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">المدينة *</label>
+          <select id="adCity" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+            <option>الرياض</option>
+            <option>جدة</option>
+            <option>الشرقية</option>
+            <option>الأحساء</option>
+            <option>مكة المكرمة</option>
+            <option>المدينة المنورة</option>
+            <option>القصيم</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">القسم *</label>
+          <select id="adCategory" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+            <option>🖥️ شاشات وستاندات</option>
+            <option>🎮 أجهزة وكونسول / PC</option>
+            <option>⌨️ كيبوردات وماوسات</option>
+            <option>🎧 صوتيات ومايكات</option>
+            <option>💡 طاولات وإضاءات</option>
+            <option>📦 قطع وإكسسوارات</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">الحالة *</label>
+          <select id="adCondition" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+            <option>مستعمل - أخو الجديد</option>
+            <option>مستعمل - بحالة جيدة</option>
+            <option>جديد بالكرتون</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-300 mb-1">صورة السلعة (رفع مباشر) 📸</label>
+        <input type="file" id="adImageFile" accept="image/*" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-2 text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:font-bold">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-300 mb-1">رقم الواتساب للتواصل *</label>
+        <input required id="adPhone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-300 mb-1">وصف السلعة بالتفصيل</label>
+        <textarea id="adDetails" rows="3" placeholder="اذكر مدة الاستخدام، حالة الضمان، والعيوب إن وجدت..." class="w-full bg-[#0d0d14] border border-[#282838] rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none"></textarea>
+      </div>
+
+      <div id="commissionNotice" class="bg-purple-950/40 border border-purple-800/40 p-3 rounded-xl text-xs text-purple-200">
+        💡 عمولة المنصة المستحقة بعد البيع هي 10% (<span id="calcFee">0</span> ريال).
+      </div>
+
+      <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold p-3 rounded-xl transition shadow-lg shadow-purple-600/30">
+        نشر الإعلان فوراً للجميع 📢
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Pay Commission -->
+<div id="commission-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-md rounded-3xl p-6 relative">
+    <button onclick="document.getElementById('commission-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
+    <h3 class="text-xl font-bold text-white mb-2">دفع عمولة الموقع (10%) 🛡️</h3>
+    <p class="text-xs text-gray-300 mb-4 leading-relaxed">
+      عمولة المنصة أمانة في ذمة البائع بعد إتمام عملية البيع عن طريق المنصة.
+    </p>
+
+    <div class="bg-[#0d0d14] border border-[#29293a] p-4 rounded-2xl mb-4 text-xs space-y-2">
+      <div class="text-purple-300 font-bold">معلومات التحويل البنكي المباشر:</div>
+      <div class="text-gray-300">اسم الحساب: <strong class="text-white">منصة عَتاد لوساطة القيمنق</strong></div>
+      <div class="text-gray-300">الآيبان IBAN:</div>
+      <div class="bg-[#1a1a28] p-2 rounded border border-purple-500/30 text-purple-300 font-mono text-center font-bold tracking-widest selection:bg-purple-600">
+        SA6180000308608010670122
+      </div>
+    </div>
+
+    <div class="text-xs text-gray-400 text-center">
+      بعد التحويل، يرجى إرسال إيصال التحويل مع اسم الإعلان لتأكيد توثيق حسابك وإبراز إعلاناتك كـ "موثوق".
+    </div>
+  </div>
+</div>
+
+<!-- JS Implementation with Firebase Integration -->
+<script>
+// Firebase Public Demo Instance Config
+const firebaseConfig = {
+  databaseURL: "https://atad-gaming-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let allProducts = [];
+let activeCategory = "الكل";
+
+const categories = ["الكل", "🖥️ شاشات وستاندات", "🎮 أجهزة وكونسول / PC", "⌨️ كيبوردات وماوسات", "🎧 صوتيات ومايكات", "💡 طاولات وإضاءات", "📦 قطع وإكسسوارات"];
+
+function renderCategories() {
+  const container = document.getElementById("categoriesContainer");
+  container.innerHTML = categories.map(cat => `
+    <button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${activeCategory === cat ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-[#181824] text-gray-300 border border-[#282838] hover:bg-[#202030]'}">
+      ${cat}
+    </button>
+  `).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  renderCategories();
+  filterProducts();
+}
+
+// Realtime Firebase Listener
+db.ref('listings').on('value', (snapshot) => {
+  const data = snapshot.val();
+  allProducts = [];
+  if (data) {
+    Object.keys(data).forEach(key => {
+      allProducts.push({ id: key, ...data[key] });
+    });
+    allProducts.sort((a,b) => b.timestamp - a.timestamp);
+  }
+  filterProducts();
+});
+
+function filterProducts() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const city = document.getElementById("cityFilter").value;
+
+  const filtered = allProducts.filter(p => {
+    const matchCat = activeCategory === "الكل" || p.category === activeCategory;
+    const matchCity = city === "الكل" || p.city === city;
+    const matchSearch = (p.title + " " + p.details + " " + p.category).toLowerCase().includes(q);
+    return matchCat && matchCity && matchSearch;
+  });
+
+  document.getElementById("itemsCount").textContent = filtered.length + " إعلان معروض";
+  const grid = document.getElementById("productsGrid");
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">لا توجد إعلانات مطابقة لجميع شروط البحث حالياً. كن أول من يضيف إعلاناً!</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <article class="bg-[#15151f] border border-[#262636] rounded-2xl overflow-hidden hover:border-purple-500/50 transition flex flex-col justify-between">
+      <div>
+        <div class="h-44 bg-[#0d0d14] relative flex items-center justify-center overflow-hidden">
+          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover">` : `<span class="text-4xl">🎮</span>`}
+          <span class="absolute top-2 right-2 bg-black/70 backdrop-blur-md text-gray-200 text-[10px] px-2 py-1 rounded-lg border border-white/10">${p.city}</span>
+          <span class="absolute top-2 left-2 bg-purple-900/80 text-purple-200 text-[10px] px-2 py-1 rounded-lg border border-purple-500/30">${p.condition}</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-white text-sm mb-1 line-clamp-1">${p.title}</h3>
+          <p class="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">${p.details || 'لا يوجد وصف إضافي'}</p>
+        </div>
+      </div>
+      <div class="p-4 pt-0">
+        <div class="text-lg font-black text-purple-400 mb-3">${Number(p.price).toLocaleString()} <span class="text-xs text-gray-400 font-normal">ر.س</span></div>
+        <a href="https://wa.me/966${p.phone.replace(/^0/,'')}?text=${encodeURIComponent('السلام عليكم، أنا متواصل معك بخصوص إعلانك في عَتاد: ' + p.title)}" target="_blank" class="block w-full text-center bg-[#1e1e2c] hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-bold py-2.5 rounded-xl border border-purple-500/30 hover:border-transparent transition">
+          💬 تواصل عبر الواتساب
+        </a>
+      </div>
+    </article>
+  `).join('');
+}
+
+function calcCommissionNotice(val) {
+  const price = Number(val) || 0;
+  document.getElementById("calcFee").textContent = Math.round(price * 0.10);
+}
+
+async function submitAd(e) {
+  e.preventDefault();
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "جاري الحفظ والنشر...";
+
+  const fileInput = document.getElementById("adImageFile");
+  let imageUrl = "";
+
+  if (fileInput.files.length > 0) {
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+    try {
+      const res = await fetch("https://api.imgbb.com/1/upload?key=6d700a208022c00222f74151b782b5e2", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if(data.data && data.data.url) imageUrl = data.data.url;
+    } catch(err) {
+      console.log("Image upload fallback");
+    }
+  }
+
+  const newAd = {
+    title: document.getElementById("adTitle").value.trim(),
+    price: Number(document.getElementById("adPrice").value),
+    city: document.getElementById("adCity").value,
+    category: document.getElementById("adCategory").value,
+    condition: document.getElementById("adCondition").value,
+    phone: document.getElementById("adPhone").value.trim(),
+    details: document.getElementById("adDetails").value.trim(),
+    imageUrl: imageUrl,
+    timestamp: Date.now()
+  };
+
+  db.ref('listings').push(newAd, (error) => {
+    btn.disabled = false;
+    btn.textContent = "نشر الإعلان فوراً للجميع 📢";
+    if (!error) {
+      document.getElementById("addForm").reset();
+      document.getElementById("add-modal").classList.add("hidden");
+      alert("تم نشر إعلانك بنجاح وسيزهر فوراً لجميع المستخدمين!");
+    } else {
+      alert("حدث خطأ أثناء النشر، حاول مرة أخرى.");
+    }
+  });
+}
+
+renderCategories();
+</script>
+</body>
+</html>
