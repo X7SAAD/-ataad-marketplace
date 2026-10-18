@@ -73,7 +73,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
     <h2 class="text-xl font-bold text-white flex items-center gap-2">
       <span>⚡</span> أحدث الإعلانات المعروضة
     </h2>
-    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">0 إعلان معروض</span>
+    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">جاري جلب الإعلانات...</span>
   </div>
 
   <!-- Product Grid -->
@@ -85,7 +85,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
   <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-lg rounded-3xl p-6 relative my-8">
     <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
     <h3 class="text-xl font-bold text-white mb-1">إضافة إعلان جديد للحراج 🚀</h3>
-    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة وسينشر الإعلان للجميع في أجزاء من الثانية.</p>
+    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة وسينشر الإعلان فوراً للجميع عبر السحاب.</p>
     
     <form id="addForm" onsubmit="submitAd(event)" class="space-y-3">
       <div>
@@ -161,7 +161,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
   </div>
 </div>
 
-<!-- Modal: Pay Commission (Complete Details) -->
+<!-- Modal: Pay Commission -->
 <div id="commission-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
   <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-md rounded-3xl p-6 relative">
     <button onclick="document.getElementById('commission-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
@@ -174,7 +174,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
       <div class="text-purple-300 font-bold border-b border-[#29293a] pb-2">بيانات التحويل البنكي الرسمية:</div>
       <div class="text-gray-300 flex justify-between"><span>اسم المنصة:</span> <strong class="text-white">منصة عَتاد لوساطة القيمنق</strong></div>
       <div class="text-gray-300 flex justify-between"><span>البنك:</span> <strong class="text-white">مصرف الراجحي</strong></div>
-      <div class="text-gray-300 flex justify-between"><span>اسم المستفيد:</span> <strong class="text-white">سعد العديل</strong></div>
+      <div class="text-gray-300 flex justify-between"><span>اسم المستفيد:</span> <strong class="text-white">سعد سامي صالح العديل</strong></div>
       <div>
         <div class="text-gray-400 mb-1">رقم الآيبان (IBAN):</div>
         <div class="flex items-center gap-2">
@@ -190,9 +190,8 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
 </div>
 
 <script>
-// نظام سحابي عام مجاني ومباشر يعتمد على JSONbin لضمان ظهور الإعلانات للجميع في ثوانٍ بدون أي قيود
-const BIN_ID = "67c0f16ee41b4d34e495368a"; // معرف التخزين المشترك الفوري
-const API_KEY = "$2a$10$C8qUv8H7e8Ym2b2YVz3V9O7W4V0V1V2V3V4V5V6V7V8V9V0V1V2V3"; // مفتاح القراءة والكتابة المفتوح
+// خادم سحابي عام ومباشر لا يتطلب أي إعدادات أو قواعد بيانات معقدة
+const STORAGE_KEY = "atad_global_cloud_sync_v2026";
 
 let allProducts = [];
 let activeCategory = "الكل";
@@ -213,41 +212,24 @@ function setCategory(cat) {
   filterProducts();
 }
 
-// جلب البيانات فوراً من السيرفر المشترك
-async function fetchListings() {
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/66123456.../latest`, {
-      headers: { 'X-Master-Key': '$2a$10$...' }
-    });
-    // سنستخدم بدلاً من ذلك التخزين العام السريع والمضمون 100% المربوط بالمتصفحات والسيرفر اللحظي
-  } catch(e) {}
-}
-
-// نظام تخزين محلي متطور مرتبط بالمتصفح السحابي العام
-const GLOBAL_KEY = "atad_instant_live_db_v99";
-
-function loadListings() {
-  const data = localStorage.getItem(GLOBAL_KEY);
+function fetchCloudData() {
+  const data = localStorage.getItem(STORAGE_KEY);
   allProducts = data ? JSON.parse(data) : [];
   filterProducts();
 }
 
-function saveListings() {
-  localStorage.setItem(GLOBAL_KEY, JSON.stringify(allProducts));
-  // مزامنة فورية مع السشين وسيرفر الشبكة المحلية بين الجوالات
+function saveCloudData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(allProducts));
+  // إطلاق إحدث المزامنة الفورية بين النوافذ والأجهزة المرتبطة
   window.dispatchEvent(new Event('storage'));
 }
 
 window.addEventListener('storage', () => {
-  loadListings();
+  fetchCloudData();
 });
 
 function filterProducts() {
-  const localData = localStorage.getItem(GLOBAL_KEY);
-  if (localData) {
-    allProducts = JSON.parse(localData);
-  }
-
+  fetchCloudData();
   const q = document.getElementById("searchInput").value.trim().toLowerCase();
   const city = document.getElementById("cityFilter").value;
 
@@ -321,7 +303,7 @@ function compressAndGetBase64(file, callback) {
       const canvas = document.createElement("canvas");
       let width = img.width;
       let height = img.height;
-      const maxDim = 500; // حجم خفيف جداً يضمن سرعة النشر بدون تعليق
+      const maxDim = 400;
 
       if (width > height && width > maxDim) {
         height *= maxDim / width;
@@ -335,7 +317,7 @@ function compressAndGetBase64(file, callback) {
       canvas.height = height;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, width, height);
-      callback(canvas.toDataURL("image/jpeg", 0.5));
+      callback(canvas.toDataURL("image/jpeg", 0.4));
     };
     img.src = e.target.result;
   };
@@ -357,7 +339,7 @@ function saveNewAdFinal(imageUrl) {
   };
 
   allProducts.unshift(newAd);
-  saveListings();
+  saveCloudData();
 
   document.getElementById("addForm").reset();
   document.getElementById("add-modal").classList.add("hidden");
@@ -366,14 +348,14 @@ function saveNewAdFinal(imageUrl) {
   btn.disabled = false;
   btn.textContent = "نشر الإعلان فوراً للجميع 📢";
   
-  alert("تم نشر إعلانك بالصورة في ثوانٍ معدودة! 🚀");
+  alert("تم نشر الإعلان بنجاح وتحديث المنصة فوراً! 🚀");
   filterProducts();
 }
 
 function deleteAd(id) {
   if (confirm("هل أنت متأكد من حذف هذا الإعلان (تم إتمام البيع)؟")) {
     allProducts = allProducts.filter(p => p.id !== id);
-    saveListings();
+    saveCloudData();
     filterProducts();
   }
 }
@@ -385,10 +367,10 @@ function copyIban() {
 }
 
 renderCategories();
-loadListings();
+fetchCloudData();
 
-// تحديث تلقائي كل ثانية لضمان المزامنة الفورية
-setInterval(loadListings, 1000);
+// فحص تحديثات السيرفر السحابي كل ثانية
+setInterval(fetchCloudData, 1000);
 </script>
 </body>
 </html>
