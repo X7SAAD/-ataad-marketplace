@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0b0b10">
 <title>عَتاد | حراج القيمنق والـ Setup</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -76,7 +75,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
     <h2 class="text-xl font-bold text-white flex items-center gap-2">
       <span>⚡</span> أحدث الإعلانات المعروضة
     </h2>
-    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">جاري الاتصال بالسحاب...</span>
+    <span id="itemsCount" class="text-xs text-gray-400 bg-[#171722] px-3 py-1 rounded-lg border border-[#282838]">جاري التحميل...</span>
   </div>
 
   <!-- Product Grid -->
@@ -88,7 +87,7 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
   <div class="bg-[#15151f] border border-[#2d2d3f] w-full max-w-lg rounded-3xl p-6 relative my-8">
     <button onclick="document.getElementById('add-modal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">✕</button>
     <h3 class="text-xl font-bold text-white mb-1">إضافة إعلان جديد للحراج 🚀</h3>
-    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة وسيتم نشرها لتظهر لجميع الزوار فوراً.</p>
+    <p class="text-xs text-gray-400 mb-4">اختر صورة السلعة مباشرة من الاستوديو وسينشر للجميع.</p>
     
     <form id="addForm" onsubmit="submitAd(event)" class="space-y-3">
       <div>
@@ -193,7 +192,6 @@ body { background-color: var(--bg); color: #f7f6fc; font-family: system-ui, -app
 </div>
 
 <script>
-// إعداد اتصال قاعدة البيانات السحابية العامة
 const firebaseConfig = {
   databaseURL: "https://atad-gaming-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
@@ -219,7 +217,6 @@ function setCategory(cat) {
   filterProducts();
 }
 
-// الاستماع المباشر للتغييرات السحابية (تحديث فوري لجميع الأجهزة)
 db.ref('listings').on('value', (snapshot) => {
   const data = snapshot.val();
   allProducts = [];
@@ -287,17 +284,45 @@ function submitAd(e) {
   const fileInput = document.getElementById("adImageFile");
   const btn = document.getElementById("submitBtn");
   btn.disabled = true;
-  btn.textContent = "جاري النشر سحابياً...";
+  btn.textContent = "جاري الحفظ والنشر...";
 
   if (fileInput.files && fileInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(uploadEvent) {
-      saveToCloud(uploadEvent.target.result);
-    };
-    reader.readAsDataURL(fileInput.files[0]);
+    compressAndGetBase64(fileInput.files[0], (compressedBase64) => {
+      saveToCloud(compressedBase64);
+    });
   } else {
     saveToCloud("");
   }
+}
+
+// دالة تصغير ضغط الصور من الاستوديو لتصبح سريعة الرفع بدون تعليق
+function compressAndGetBase64(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+      const maxDim = 600; // أقصى عرض لسرعة فائقة
+
+      if (width > height && width > maxDim) {
+        height *= maxDim / width;
+        width = maxDim;
+      } else if (height > maxDim) {
+        width *= maxDim / height;
+        height = maxDim;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL("image/jpeg", 0.6)); // جودة متوازنة وحجم خفيف جداً
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function saveToCloud(imageUrl) {
@@ -317,13 +342,12 @@ function saveToCloud(imageUrl) {
     const btn = document.getElementById("submitBtn");
     btn.disabled = false;
     btn.textContent = "نشر الإعلان فوراً للجميع 📢";
-    
     if (!error) {
       document.getElementById("addForm").reset();
       document.getElementById("add-modal").classList.add("hidden");
-      alert("تم نشر الإعلان سحابياً وسيظهر فوراً في كل الأجهزة! 🚀");
+      alert("تم نشر الإعلان بالصورة وظهر للجميع فوراً! 🚀");
     } else {
-      alert("حدث خطأ في الاتصال، تأكد من الإنترنت.");
+      alert("حدث خطأ، تأكد من الإنترنت.");
     }
   });
 }
